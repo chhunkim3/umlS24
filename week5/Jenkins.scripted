@@ -32,7 +32,7 @@ podTemplate(containers: [
                         ./gradlew test
 			./gradlew jacocoTestCoverageVerification
                         ./gradlew jacocoTestReport
-			./gradlew checkstyle
+			./gradlew checkstyleMain
                         '''
                     } catch (Exception E) {
                         echo 'Failure detected'
@@ -55,7 +55,7 @@ podTemplate(containers: [
                           ./gradlew test
 			  ./gradlew jacocoTestCoverageVerification
                           ./gradlew jacocoTestReport
-			  ./gradlew checkstyle
+			  ./gradlew checkstyleMain
                         '''
                     } catch (Exception E) {
                         echo 'Failure detected'
