@@ -47,7 +47,7 @@ podTemplate(containers: [
                     ])                       
                 }
 				
-		stage("Jacoco Checkstyle") {
+		stage("JaCoCo Checkstyle") {
 		try {
                         sh '''
         	            pwd
