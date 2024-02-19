@@ -11,8 +11,8 @@ podTemplate(containers: [
 
     node(POD_LABEL) {
         stage('Run pipeline against a gradle project') {
-             // "container" Selects a container of the agent pod so that all shell steps are
-     // executed in that container.
+            // "container" Selects a container of the agent pod so that all shell steps are
+	    // executed in that container.
             container('gradle') {
                 stage('Build a gradle project') {
                     // from the git plugin
@@ -25,13 +25,14 @@ podTemplate(containers: [
                 }
             
                 stage("Tests") {
-		      try {
-                        sh '''
-        	            pwd
-               		    cd Chapter08/sample1
-                          ./gradlew test
-			  ./gradlew jacocoTestCoverageVerification
-                          ./gradlew jacocoTestReport
+		try {
+                	sh '''
+        	        pwd
+               		cd Chapter08/sample1
+                        ./gradlew test
+			./gradlew jacocoTestCoverageVerification
+                        ./gradlew jacocoTestReport
+			./gradlew checkstyle
                         '''
                     } catch (Exception E) {
                         echo 'Failure detected'
@@ -41,11 +42,33 @@ podTemplate(containers: [
                     // https://www.jenkins.io/doc/pipeline/steps/htmlpublisher/
                     publishHTML (target: [
                     	reportDir: 'Chapter08/sample1/build/reports/tests/test',
-                       reportFiles: 'index.html',
-                       reportName: "JaCoCo Report"
+						reportFiles: 'index.html',
+						reportName: "JaCoCo Report"
                     ])                       
                 }
+				
+		stage("Jacoco Checkstyle") {
+		try {
+                        sh '''
+        	            pwd
+            		    cd Chapter08/sample1
+                          ./gradlew test
+			  ./gradlew jacocoTestCoverageVerification
+                          ./gradlew jacocoTestReport
+			  ./gradlew checkstyle
+                        '''
+                    } catch (Exception E) {
+                        echo 'Failure detected'
+                    }
+					
+		publishHTML (target: [
+			reportDir: 'Chapter08/sample1/build/reports/tests/test',
+			reportFiles: 'index.html',
+			reportName: "JaCoCo Checkstyle"
+                ]) 
+		}
            }
         }
     }
 }
+kubernetes.setPodRetention(org.csanchez.jenkins.plugins.kubernetes.pod.retention.PodRetention.onFailure())
