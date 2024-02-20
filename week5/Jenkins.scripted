@@ -71,4 +71,11 @@ podTemplate(containers: [
         }
     }
 }
-kubernetes.setPodRetention(org.csanchez.jenkins.plugins.kubernetes.pod.retention.PodRetention.onFailure())
+
+kubernetes {
+    cloud 'ci-build'
+    defaultContainer 'shell'
+    podRetention onFailure()
+    // Other configuration settings...
+}
+
