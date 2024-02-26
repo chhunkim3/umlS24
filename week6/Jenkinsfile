@@ -24,28 +24,28 @@ podTemplate(containers: [
                     '''
                 }
             
-                stage("Tests") {
-            					try {
+              	stage("Tests") {
+            				try {
             						sh '''
             						pwd
             						cd Chapter08/sample1
             						./gradlew jacocoTestCoverageVerification
                         '''
-                      } catch (Exception E) {
-                          echo 'Failure detected'
-                      }                      
+                    } catch (Exception E) {
+                        echo 'Failure detected'
+                    }                      
                 }
 				
         				stage("JaCoCo Checkstyle") {
-        					    try {
+        					  try {
             						sh '''
             						pwd
             						cd Chapter08/sample1
             						./gradlew jacocoTestCoverageVerification
             						'''
-            					} catch (Exception E) {
+            				} catch (Exception E) {
             						echo 'Failure detected'
-            				  }
+            				}
         				}
 				
         				environment {
