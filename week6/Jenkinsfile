@@ -1,37 +1,64 @@
-pipeline {
-  agent {
-    kubernetes {
-      // Define the pod template with container template
-      containerTemplate {
-            name 'gradle'
-            image 'gradle'
-            command 'sleep'
-            args '30d'
-        }
-    }
-  }
-  
-  stages {
-    stage('Checkout code and prepare environment') {
-      steps {
-        git url: 'https://github.com/dlambrig/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
-        sh """
-          cd Chapter08/sample1
-          chmod +x gradlew
-        """
-      }
-    }
-    stage('Run pipeline against a gradle project - test branch') {
-      when {
-        not { branch 'main' }
-      }
-      steps {
-         echo 'Unit test not main branch'
-         sh """
-           cd Chapter08/sample1; 
-           ./gradlew test
-         """
-      }
-    }
-  }
+// This example uses Jenkin's "scripted" syntax, as opposed to its "declarative" syntax
+// see: https://www.jenkins.io/doc/book/pipeline/syntax/#scripted-pipeline
+
+// Defines a Kubernetes pod template that can be used to create nodes.
+
+podTemplate(containers: [
+    containerTemplate(
+        name: 'gradle', image: 'gradle:6.3-jdk14', command: 'sleep', args: '30d'
+        ),
+    ]) {
+
+    node(POD_LABEL) {
+        stage('Run pipeline against a gradle project') {
+            // "container" Selects a container of the agent pod so that all shell steps are
+	          // executed in that container.
+            container('gradle') {
+                stage('Build a gradle project') {
+                    // from the git plugin
+                    // https://www.jenkins.io/doc/pipeline/steps/git/
+                    git 'https://github.com/chhunkim3/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
+                    sh '''
+                    cd Chapter08/sample1
+                    chmod +x gradlew
+                    '''
+                }
+            
+                stage("Tests") {
+            					try {
+            						sh '''
+            						pwd
+            						cd Chapter08/sample1
+            						./gradlew jacocoTestCoverageVerification
+                        '''
+                      } catch (Exception E) {
+                          echo 'Failure detected'
+                      }                      
+                }
+				
+        				stage("JaCoCo Checkstyle") {
+        					    try {
+            						sh '''
+            						pwd
+            						cd Chapter08/sample1
+            						./gradlew jacocoTestCoverageVerification
+            						'''
+            					} catch (Exception E) {
+            						echo 'Failure detected'
+            				  }
+        				}
+				
+        				environment {
+        					CONSTANT_NAME = 'constantvalue'
+        				}
+			      }
+	    	}
+  	}
+}
+
+kubernetes {
+    cloud 'ci-build'
+    defaultContainer 'shell'
+    podRetention onFailure()
+    // Other configuration settings...
 }
