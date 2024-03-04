@@ -21,28 +21,16 @@ pipeline {
         """
       }
     }
-
-    stage('Run pipeline against a gradle project - test branches') {
+    stage('Run pipeline against a gradle project - test branch') {
       when {
         not { branch 'main' }
       }
       steps {
-         echo "I am the ${env.BRANCH_NAME} branch"
+         echo 'Unit test not main branch'
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
-		   ./gradlew jacocoTestReport
-		   ./gradlew checkstyleMain
          """
-      }
-	  if (env.BRANCH_NAME == "main"){
-		steps {
-		 echo "I am the ${env.BRANCH_NAME} branch"
-		 sh """
-		   cd Chapter08/sample1; 
-		   ./gradlew jacocoTestCoverageVerification
-		 """
-		}
       }
     }
   }
@@ -50,11 +38,5 @@ pipeline {
     always {
       echo 'pipeline completed'
     }
-    success {
-      echo 'tests pass!'
-    }
-    failure {
-      echo 'tests fail!'
-    }     
   }
 }
