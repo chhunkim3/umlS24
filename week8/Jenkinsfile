@@ -55,7 +55,7 @@ pipeline {
 	container('kaniko') {
 		echo 'Build Docker Image In Kubernetes Pod'
 		sh '''
-  		/kaniko/executor --context `pwd` --destination chhunkim3/hello-kaniko:1.0
+  		echo 'CREATE CONTAINER HERE'
   		'''
 	}
       }
