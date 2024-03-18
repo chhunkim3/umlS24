@@ -7,7 +7,7 @@ pipeline {
             image 'gradle'
             command 'sleep'
             args '30d'
-        }
+	}
     }
   }
   
@@ -24,7 +24,7 @@ pipeline {
 
     stage('Run pipeline against a gradle project - Non Main Branch') {
       when {
-        not { branch 'main' }
+        not { branch 'main' && 'playground' }
       }
       steps {
          echo 'Unit test not main branch'
@@ -37,7 +37,6 @@ pipeline {
 	   ./gradlew jacocoTestReport
          """
       } 
-
       post {
 	success {
 	  echo 'tests success!'
@@ -46,8 +45,15 @@ pipeline {
       	  echo 'tests fail!'
     	}
       }
+
+      when {
+	branch 'playground'  
+      }
+      steps {
+	echo 'Playground branch, no container needed.'      
+      }
     }
-    
+	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
       when {
 	  branch 'main'
