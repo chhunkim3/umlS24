@@ -22,12 +22,12 @@ pipeline {
       }
     }
 
-    stage('Run pipeline against a gradle project - Non Main Branch') {
+    stage('Run pipeline against a gradle project - feature Branch') {
       when {
-        not { branch 'main' && 'playground' }
+        branch 'feature'
       }
       steps {
-         echo 'Unit test not main branch'
+         echo 'Unit test Feature branch'
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
