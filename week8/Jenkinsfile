@@ -46,6 +46,23 @@ pipeline {
     	}
       }
     }
+
+    stage('Run pipeline against a gradle project - Playground Branch') {	  
+      when {
+	  branch 'playground'
+      }
+      steps {
+	 echo 'Unit test Playground Branch'
+	 sh """
+           cd Chapter08/sample1; 
+           ./gradlew test
+	   ./gradlew testClasses
+	   ./gradlew processTestResources
+    	   ./gradlew compileTestJava
+	   ./gradlew jacocoTestReport
+         """
+      }
+    }
 	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
       when {
