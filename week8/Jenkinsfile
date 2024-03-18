@@ -1,5 +1,5 @@
 pipeline {
-  agent {
+   agent {
     kubernetes {
       // Define the pod template with container template
       containerTemplate {
@@ -8,7 +8,7 @@ pipeline {
             command 'sleep'
             args '30d'
         }
-    }
+     }
   }
   
   stages {
@@ -22,12 +22,12 @@ pipeline {
       }
     }
 
-    stage('Run pipeline against a gradle project - Non Main Branch') {
+    stage('Run pipeline against a gradle project - Not Main Branch') {
       when {
-        not { branch 'main' }
+	 not { branch 'main' }
       }
       steps {
-         echo 'Unit test not main branch'
+         echo 'Unit test Not Main branch'
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
@@ -39,14 +39,28 @@ pipeline {
       } 
       post {
 	success {
-      	  echo 'tests pass!'
+	  echo 'tests success!'
     	}
     	failure {
       	  echo 'tests fail!'
     	}
       }
     }
-    
+
+    stage('Build a container if this is NOT playground branch') {	  
+      when {
+	  not { branch 'playground' }
+      }
+      steps {
+	container('kaniko') {
+		echo 'Build Docker Image In Kubernetes Pod'
+		sh '''
+  		echo 'CREATE CONTAINER HERE'
+  		'''
+	}
+      }
+    }
+	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
       when {
 	  branch 'main'
