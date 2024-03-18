@@ -8,12 +8,6 @@ pipeline {
             command 'sleep'
             args '30d'
         }
-       containerTemplate{
-	    name 'kaniko'
-	    image 'gcr.io/kaniko-project/executor:debug'
-	    command 'sleep'
-	    args '9999999'
-       }
      }
   }
   
