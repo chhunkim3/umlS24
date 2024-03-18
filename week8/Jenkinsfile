@@ -60,9 +60,7 @@ pipeline {
 	container('kaniko') {
 		echo 'Build Docker Image In Kubernetes Pod'
 		sh '''
-  		docker push chhunkim3/docker-registry:kaniko-ex8
-    		kubectl apply -f pod.yaml
-      		kubectl logs kaniko --follow
+  		/kaniko/executor --context `pwd` --destination chhunkim3/hello-kaniko:1.0
   		'''
 	}
       }
