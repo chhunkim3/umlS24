@@ -14,6 +14,10 @@ pipeline {
   stages {
     stage('Checkout code and prepare environment') {
       steps {
+	script {
+          // For testing as a normal pipeline, I am setting this manually. A multibranch will have this set already when the pull request (for example) triggers.
+          env.BRANCH_NAME = "master"
+        }     
         git url: 'https://github.com/dlambrig/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git', branch: 'master'
         sh """
           cd Chapter08/sample1
