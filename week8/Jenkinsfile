@@ -1,14 +1,44 @@
 pipeline {
   agent {
     kubernetes {
-      // Define the pod template with container template
-      containerTemplate {
-            name 'gradle'
-            image 'gradle'
-            command 'sleep'
-            args '30d'
+            yaml """
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                  - name: gradle
+                    image: gradle
+                    command:
+                    - sleep
+                    args:
+                    - 99d
+                    volumeMounts:
+                    - name: shared-storage
+                      mountPath: /mnt        
+                  - name: kaniko
+                    image: gcr.io/kaniko-project/executor:debug
+                    command:
+                    - sleep
+                    args:
+                    - 9999999
+                    volumeMounts:
+                    - name: shared-storage
+                      mountPath: /mnt
+                    - name: kaniko-secret
+                      mountPath: /kaniko/.docker
+                  restartPolicy: Never
+                  volumes:
+                  - name: shared-storage
+                    persistentVolumeClaim:
+                      claimName: jenkins-pv-claim
+                  - name: kaniko-secret
+                    secret:
+                        secretName: dockercred
+                        items:
+                        - key: .dockerconfigjson
+                          path: config.json
+            """
         }
-    }
   }
   
   stages {
@@ -22,12 +52,12 @@ pipeline {
       }
     }
 
-    stage('Run pipeline against a gradle project - Non Main Branch') {
+    stage('Run pipeline against a gradle project - Not Main Branch') {
       when {
-        not { branch 'main' }
+	 not { branch 'main' }
       }
       steps {
-         echo 'Unit test not main branch'
+         echo 'Unit test Feature branch'
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
@@ -39,37 +69,31 @@ pipeline {
       } 
       post {
 	success {
-	    stages {
-      	  	stage('Create a container if the branch not PlayGround') {	
-	      	  when {
-		    not { branch 'playground' }
-		  }
-		  steps {
-		    container('kaniko') {
-	                    sh '''
-	                    echo 'FROM openjdk:8-jre' > Dockerfile
-	                    echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
-	                    echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
-	                    mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
-	                    /kaniko/executor --context `pwd` --destination chhunkim3/hello-kaniko:1.0
-	                    '''
-	            }
-		  }
-		  when {
-		    branch 'playground'
-		  }
-		  steps {
-		    echo 'This is playground branch. No container needed.'
-		  }
-	    	}
-	    }
+	  echo 'tests success!'
     	}
     	failure {
       	  echo 'tests fail!'
     	}
       }
     }
-    
+
+    stage('Build a container if this is NOT playground branch') {	  
+      when {
+	  not { branch 'playground' }
+      }
+      steps {
+	container('kaniko') {
+	    sh '''
+	    echo 'FROM openjdk:8-jre' > Dockerfile
+	    echo 'COPY ./calculator-0.0.1-SNAPSHOT.jar app.jar' >> Dockerfile
+	    echo 'ENTRYPOINT ["java", "-jar", "app.jar"]' >> Dockerfile
+	    mv /mnt/calculator-0.0.1-SNAPSHOT.jar .
+	    /kaniko/executor --context `pwd` --destination dlambrig/hello-kaniko:1.0
+	    '''
+	 }
+       }
+    }
+	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
       when {
 	  branch 'main'
