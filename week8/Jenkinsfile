@@ -52,8 +52,15 @@ pipeline {
 	  not { branch 'playground' }
       }
       steps {
-	echo 'CREATE CONTAINER HERE'
-       }
+	container('kaniko') {
+		echo 'Build Docker Image In Kubernetes Pod'
+		sh '''
+  		docker push chhunkim3/docker-registry:kaniko-ex8
+    		kubectl apply -f pod.yaml
+      		kubectl logs kaniko --follow
+  		'''
+	}
+      }
     }
 	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
