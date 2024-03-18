@@ -45,13 +45,6 @@ pipeline {
       	  echo 'tests fail!'
     	}
       }
-
-      when {
-	branch 'playground'  
-      }
-      steps {
-	echo 'Playground branch, no container needed.'      
-      }
     }
 	  
     stage('Run pipeline against a gradle project - Main Branch') {	  
