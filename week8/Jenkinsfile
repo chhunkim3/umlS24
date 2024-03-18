@@ -24,8 +24,7 @@ pipeline {
 
     stage('Run pipeline against a gradle project - feature Branch') {
       when {
-	not { branch 'main' }
-        equals { branch 'feature'}
+	 branch 'feature'
       }
       steps {
          echo 'Unit test Feature branch'
@@ -50,8 +49,7 @@ pipeline {
 
     stage('Run pipeline against a gradle project - Playground Branch') {	  
       when {
-	  not { branch 'main' }
-	  equals { branch 'playground' }
+	  branch 'playground'
       }
       steps {
 	 echo 'Unit test Playground Branch'
