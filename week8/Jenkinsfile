@@ -27,7 +27,7 @@ pipeline {
 	 not { branch 'main' }
       }
       steps {
-         echo 'Unit test Feature branch'
+         echo 'Unit test Not Main branch'
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
