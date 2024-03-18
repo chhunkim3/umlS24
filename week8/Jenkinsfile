@@ -40,14 +40,13 @@ pipeline {
       } 
       post {
 	success {
-	  echo 'tests success!'
 	  script {
               echo "Post success script: " + env.BRANCH_NAME
-       	      if ( env.BRANCH_NAME == 'master' ) {
+       	      if ( env.BRANCH_NAME != 'playground' ) {
           	echo "Create container repository/calculator:1.0"
 	        container('kaniko') {
 		    sh '''
-		    echo IN KANIKO CONTAINER
+		    echo 'Created a container'
 		    '''
               }
             }
