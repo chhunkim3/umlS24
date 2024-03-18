@@ -39,7 +39,8 @@ pipeline {
       } 
       post {
 	success {
-      	  stage('Create a container if the branch not PlayGround') {	
+	    stages {
+      	  	stage('Create a container if the branch not PlayGround') {	
 	      	  when {
 		    not { branch 'playground' }
 		  }
@@ -60,7 +61,8 @@ pipeline {
 		  steps {
 		    echo 'This is playground branch. No container needed.'
 		  }
-	    }	
+	    	}
+	    }
     	}
     	failure {
       	  echo 'tests fail!'
