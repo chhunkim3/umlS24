@@ -21,7 +21,7 @@ pipeline {
         """
       }
     }
-    stage('Run pipeline against a gradle project - test branch') {
+    stage('Run pipeline against a gradle project - Non Main Branch') {
       when {
         not { branch 'main' }
       }
@@ -30,7 +30,32 @@ pipeline {
          sh """
            cd Chapter08/sample1; 
            ./gradlew test
+	         ./gradlew testClasses
+	         ./gradlew processTestResources
+    	     ./gradlew compileTestJava
+	         ./gradlew jacocoTestReport
          """
+      } 
+      post {
+	      success {
+      	  echo 'tests pass!'
+    	  }
+    	  failure {
+      	  echo 'tests fail!'
+    	  }
+      }
+    }
+    
+    stage('Run pipeline against a gradle project - Main Branch') {	  
+      when {
+	      branch 'main'
+      }
+      steps {
+	       echo 'Unit test Main Branch'
+	       sh """
+ 	       cd Chapter08/sample1; 
+	       ./gradlew jacocoTestCoverageVerification
+	       """
       }
     }
   }
