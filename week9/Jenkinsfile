@@ -22,7 +22,6 @@ podTemplate(yaml: '''
           ./gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080
           ./gradlew flywayMigrate -i
           ./gradlew bootRun
-          $ curl localhost:8080/sum?a=1\&b=2
           '''
         }
       }
