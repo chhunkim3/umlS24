@@ -19,7 +19,7 @@ podTemplate(yaml: '''
           sh '''
           cd Chapter09/sample1
           chmod +x gradlew
-          ./gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080/sum?a=6\\&b=2
+          ./gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080/sum?a=3\&b=3
           '''
         }
       }
