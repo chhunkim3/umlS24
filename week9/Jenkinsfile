@@ -22,7 +22,7 @@ podTemplate(yaml: '''
             chmod +x ./kubectl
             ./kubectl apply -f calculator.yaml
             ./kubectl apply -f hazelcast.yaml
-            curl  calculator-service.devops-tools.svc.cluster.local:8080/sum?a=3\&b=4
+            curl  -i calculator-service.devops-tools.svc.cluster.local:8080/sum?a=3\&b=4
           '''
         }
       }
