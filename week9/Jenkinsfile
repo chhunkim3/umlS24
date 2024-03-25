@@ -18,9 +18,8 @@ podTemplate(yaml: '''
         stage('start calculator') {
           sh '''
           cd Chapter09/sample1
-          chmod +x ./kubectl
-          ./kubectl apply -f calculator.yaml
-          ./kubectl apply -f hazelcast.yaml
+          chmod +x gradlew
+          ./gradlew acceptanceTest -Dcalculator.url=http://calculator-service:8080
           '''
         }
       }
