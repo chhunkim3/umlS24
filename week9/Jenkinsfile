@@ -3,8 +3,8 @@ podTemplate(yaml: '''
     kind: Pod
     spec:
       containers:
-      - name: centos
-        image: centos
+      - name: gradle
+        image: gradle:jdk8
         command:
         - sleep
         args:
@@ -14,7 +14,7 @@ podTemplate(yaml: '''
   node(POD_LABEL) {
     stage('First Stage') {
       git 'https://github.com/chhunkim3/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
-      container('centos') {
+      container('gradle') {
         stage('start calculator') {
           sh '''
           cd Chapter09/sample1
