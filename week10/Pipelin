@@ -1,0 +1,67 @@
+podTemplate(yaml: '''
+  apiVersion: v1
+  kind: Pod
+  spec:
+    containers:
+    - name: centos
+      image: centos
+      command:
+      - sleep
+      args:
+      - 99d
+    - name: cloud-sdk
+      image: google/cloud-sdk:latest
+      command:
+      - sleep
+      args:
+      - 9999999
+      volumeMounts:
+      - name: shared-storage
+        mountPath: /mnt
+      - name: google-cloud-key
+        mountPath: /var/secrets/google
+      env:
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        value: /var/secrets/google/umls24-418119-e57e00d7513d.json
+    restartPolicy: Never
+    volumes:
+    - name: shared-storage
+      persistentVolumeClaim:
+        claimName: jenkins-pv-claim
+    - name: google-cloud-key
+      secret:
+        secretName: sdk-key
+''') {
+  node(POD_LABEL) {
+    stage('k8s') {
+    git 'https://github.com/dlambrig/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
+      container('centos') {
+        stage('start calculator') {
+          sh '''
+          cd Chapter08/sample1
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s
+          https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          ./kubectl apply -f calculator.yaml
+          ./kubectl apply -f hazelcast.yaml
+          '''
+        }
+
+        stage('Deploying to prod') {
+          container('cloud-sdk') {
+            stage('Build a gradle project') {
+              sh '''
+              echo 'namespaces in the docker "staging" environment'
+              kubectl get ns
+              gcloud auth login --cred-file=$GOOGLE_APPLICATION_CREDENTIALS --no-launch-browser
+              gcloud container clusters get-credentials hello-cluster --region us-central1 --project umls24-418119
+              echo 'namespaces in the GKE "prod" environment'
+              kubectl get ns
+              '''
+           }
+         }
+        }
+      }
+    }
+  }
+}
